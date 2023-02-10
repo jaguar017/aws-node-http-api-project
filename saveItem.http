@@ -1,0 +1,7 @@
+GET https://k1322p0hrk.execute-api.us-east-1.amazonaws.com/dev/item/{ID_1}
+Content-Type: application/json
+
+# {
+#     "name": "Marcia",
+#     "something": "test"
+# }

@@ -11,6 +11,9 @@ provider:
   name: aws
   runtime: nodejs18.x
   environment: ${self:custom}
+  logs:
+    httpApi: true
+    format: '{ "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime" ,"menthod": "$context.httpMethod"}'
 
 functions:
   saveItem:
@@ -19,6 +22,7 @@ functions:
       - http:
           path: item
           method: post
+      - cloudwatchLog: '/aws/lambda/aws-node-http-api-project-dev-saveItem'
     iamRoleStatements:
       - Effect: "Allow"        
         Action:
@@ -33,6 +37,8 @@ functions:
       - http:
           path: item/{itemId}
           method: get
+      - cloudwatchLog: 
+          logGroup: '/aws/lambda/aws-node-http-api-project-dev-getItem'
     iamRoleStatements:
       - Effect: "Allow"        
         Action:
@@ -57,3 +63,11 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.ITEMS_DYNAMODB_TABLE}
+    AccessLoggedApi: 
+      Type: AWS::Logs::LogGroup
+      Properties: 
+        AccessLogSettings:
+          DestinationArn: !GetAtt AccessLogGroup.Arn
+          Format: '{"requestTime":"$context.requestTime","requestId":"$context.requestId","httpMethod":"$context.httpMethod","path":"$context.path","routeKey":"$context.routeKey","status":$context.status,"responseLatency":$context.responseLatency}'     
+    AccessLogGroup:
+      Type: AWS::Logs::LogGroup

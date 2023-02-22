@@ -3,13 +3,29 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-domain-manager
+  - serverless-certificate-creator
 
 custom:
+  customDomain:
+    domainName: test.batterypool.com
+    basePath: ''
+    stage: ${self:provider.stage}
+    certificateName: 'test.batterypool.com'
+    createRoute53Record: true
+  customCertificate:
+    certificateName: 'test.batterypool.com' 
+    hostedZoneNames: 'batterypool.com.'
+    region: us-east-1
+    writeCertInfoToFile: true
+    certInfoFileName: "certs/${self:provider.stage}/cert-info.yml"
+    rewriteRecords: false
   ITEMS_DYNAMODB_TABLE: sls-basic-operations-items
 
 provider:
   name: aws
   runtime: nodejs18.x
+  stage: dev
   environment: ${self:custom}
 
 functions:
